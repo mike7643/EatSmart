@@ -16,7 +16,6 @@ public class Diet {
     private List<Food> lunch = new ArrayList<>();
     private List<Food> dinner = new ArrayList<>();
 
-    // Getters and Setters
 
     public void addBreakfast(Food food) {
         this.breakfast.add(food);

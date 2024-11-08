@@ -6,20 +6,24 @@ import com.boorisoogeo.EatSmart.repository.FoodSearchCond;
 import com.boorisoogeo.EatSmart.repository.FoodUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class FoodService {
 
     private final FoodRepository foodRepository;
 
+    @Transactional
     public Food save(Food food) {
         return foodRepository.save(food);
     }
 
+    @Transactional
     public void update(Long itemId, FoodUpdateDto updateParam) {
         foodRepository.update(itemId, updateParam);
     }
@@ -28,10 +32,11 @@ public class FoodService {
         return foodRepository.findById(id);
     }
 
-    public List<Food> findFoods(FoodSearchCond cond) {
-        return foodRepository.findAll(cond);
+    public List<Food> findFoods(FoodSearchCond cond, int page, int size) {
+        return foodRepository.findAllWithPaging(cond,page,size);
     }
 
+    @Transactional
     public void delete(Long foodId) {
         foodRepository.delete(foodId);
     }

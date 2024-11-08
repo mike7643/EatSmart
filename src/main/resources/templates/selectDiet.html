@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>식단 관리</title>
+    <title>음식 선택</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -176,7 +176,57 @@
                 margin-right: 0;
             }
         }
+
+         .pagination {
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             margin-top: 20px;
+         }
+
+        .pagination a, .pagination span {
+            margin: 0 5px;
+            padding: 8px 12px;
+            background-color: #f2f2f2;
+            color: #333;
+            text-decoration: none;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .pagination a.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            pointer-events: none; /* 현재 페이지 비활성화 */
+        }
+
+        .pagination span {
+            background-color: transparent;
+            border: none;
+            cursor: default;
+        }
+
+        .pagination span:hover {
+            background-color: transparent;
+        }
+
+        .pagination a.btn-secondary {
+            background-color: #e2e2e2;
+        }
+
+        .pagination a.btn-secondary:hover {
+            background-color: #ccc;
+        }
     </style>
+
+
 </head>
 <body>
 <div class="container">
@@ -225,8 +275,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="food : ${foods}">
-                <td><a th:href="@{/foods/{foodId}(foodId=${food.foodId})}" th:text="${food.foodId}">음식번호</a></td>
+            <tr th:each="food, iterStat : ${foods}">
+                <td th:text="${iterStat.index + 1 + (currentPage * pageSize)}">음식번호</td>
                 <td><a th:href="@{|/foods/${food.foodId}|}" th:text="${food.foodName}">음식 이름</a></td>
                 <td th:text="${food.foodKcal}">10000</td>
                 <td th:text="${food.foodProtein}">10000</td>
@@ -249,6 +299,45 @@
             </tr>
             </tbody>
         </table>
+
+        <div class="pagination">
+            <!-- 이전 버튼 -->
+            <a th:if="${currentPage > 0}"
+               th:href="@{/add/{mealType}(mealType=${mealType}, page=${currentPage - 1}, size=${pageSize}, foodName=${foodSearch.foodName})}"
+               class="btn-secondary">
+                이전
+            </a>
+
+            <!-- 첫 페이지 버튼 -->
+            <a th:if="${currentPage > 2}"
+               th:href="@{/add/{mealType}(mealType=${mealType}, page=0, size=${pageSize}, foodName=${foodSearch.foodName})}">1</a>
+            <span th:if="${currentPage > 3}">...</span>
+
+            <!-- 동적 페이지 번호 -->
+            <span th:each="pageNum : ${#numbers.sequence(
+            currentPage > 3 ? currentPage - 2 : 0,
+            currentPage + 3 < totalPages - 1 ? currentPage + 2 : totalPages - 1
+        )}">
+        <a th:href="@{/add/{mealType}(mealType=${mealType}, page=${pageNum}, size=${pageSize}, foodName=${foodSearch.foodName})}"
+           th:text="${pageNum + 1}"
+           th:classappend="${pageNum == currentPage} ? 'active' : ''">
+        </a>
+    </span>
+
+            <!-- 마지막 페이지와 ... 표시 -->
+            <span th:if="${currentPage + 3 < totalPages - 2}">...</span>
+            <a th:if="${currentPage + 3 < totalPages - 1}"
+               th:href="@{/add/{mealType}(mealType=${mealType}, page=${totalPages - 1}, size=${pageSize}, foodName=${foodSearch.foodName})}"
+               th:text="${totalPages}"></a>
+
+            <!-- 다음 버튼 -->
+            <a th:if="${currentPage + 1 < totalPages}"
+               th:href="@{/add/{mealType}(mealType=${mealType}, page=${currentPage + 1}, size=${pageSize}, foodName=${foodSearch.foodName})}"
+               class="btn-secondary">
+                다음
+            </a>
+        </div>
+
     </div>
 </div>
 </body>

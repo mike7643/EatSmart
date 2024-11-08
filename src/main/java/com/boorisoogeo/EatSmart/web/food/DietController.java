@@ -27,6 +27,8 @@ import java.util.List;
 public class DietController {
     private final FoodService foodService;
     private final MealRepository mealRepository;
+    private final FoodRepository foodRepository;
+
     @GetMapping
     public String getMeals(@SessionAttribute(name = "loginMember", required = false) Member loginMember, Model model) {
         if (loginMember != null) {
@@ -51,9 +53,25 @@ public class DietController {
     }
 
     @GetMapping("/{mealType}")
-    public String showDietForm(@PathVariable String mealType, @ModelAttribute("foodSearch") FoodSearchCond foodSearch, HttpServletRequest request, Model model) {
-        List<Food> foods = foodService.findFoods(foodSearch);
+    public String showDietForm(@PathVariable String mealType, @ModelAttribute("foodSearch") FoodSearchCond cond,
+                               @RequestParam(defaultValue = "0")int page,
+                               @RequestParam(defaultValue = "10")int size,
+                               HttpServletRequest request, Model model) {
+
+        List<Food> foods = foodService.findFoods(cond, page, size);
+        int totalPages = (int) Math.ceil((double) foodRepository.countTotalFoods(cond)/ size);
+
+        // 페이지 값 검증: 범위를 벗어나면 조정
+        if (page < 0) {
+            page = 0;  // 최소 페이지 값으로 조정
+        } else if (page >= totalPages) {
+            page = totalPages - 1;  // 최대 페이지 값으로 조정
+        }
+
         model.addAttribute("foods", foods);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", size);
+        model.addAttribute("totalPages", totalPages);
         String requestURI = request.getRequestURI();
         model.addAttribute("currentURI", requestURI);
         model.addAttribute("mealType",mealType);

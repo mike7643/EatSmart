@@ -16,7 +16,6 @@ import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -29,7 +28,8 @@ public class FoodRepository {
     }
 
     public Food save(Food food) {
-        String sql = "insert into food (food_name, food_kcal, food_protein, food_fat, food_carbo, food_sugar, food_nat, food_colest) values (:foodName, :foodKcal, :foodProtein, :foodFat, :foodCarbo, :foodSugar, :foodNat, :foodColest)";
+        String sql = "insert into food (food_name, food_kcal, food_protein, food_fat, food_carbo, food_sugar, food_nat, food_colest) "+
+                "values (:foodName, :foodKcal, :foodProtein, :foodFat, :foodCarbo, :foodSugar, :foodNat, :foodColest)";
 
         SqlParameterSource param = new BeanPropertySqlParameterSource(food);
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -78,18 +78,43 @@ public class FoodRepository {
         }
     }
 
+    public List<Food> findAllWithPaging(FoodSearchCond cond, int page, int size) {
+        String foodName = cond.getFoodName();
+
+        StringBuilder sql = new StringBuilder("SELECT food_id, food_name, food_kcal, food_protein, food_fat, food_carbo, food_sugar, food_nat, food_colest FROM food");
+
+        // 동적 조건 추가
+        if (StringUtils.hasText(foodName)) {
+            sql.append(" WHERE food_name LIKE concat('%', :foodName, '%')");
+        }
+        // 페이징 추가
+        sql.append(" ORDER BY food_id ASC"); // 정렬 기준 추가
+        sql.append(" LIMIT :size OFFSET :offset"); // LIMIT과 OFFSET 추가
+
+
+        // 페이징 파라미터 추가
+        MapSqlParameterSource pagingParams = new MapSqlParameterSource()
+                .addValue("foodName", foodName)
+                .addValue("size", size)
+                .addValue("offset", page * size); // OFFSET 계산
+
+        log.info("Executing query: {}", sql);
+        return template.query(sql.toString(), pagingParams, foodRowMapper());
+    }
+
+
     public List<Food> findAll(FoodSearchCond cond) {
         String foodName = cond.getFoodName();
         SqlParameterSource param = new BeanPropertySqlParameterSource(cond);
-        String sql = "select food_id, food_name, food_kcal, food_protein, food_fat, food_carbo, food_sugar, food_nat, food_colest from food";
 
-        // 동적 쿼리
+        StringBuilder sql = new StringBuilder("SELECT food_id, food_name, food_kcal, food_protein, food_fat, food_carbo, food_sugar, food_nat, food_colest FROM food");
+
         if (StringUtils.hasText(foodName)) {
-            sql += " where food_name like concat('%', :foodName, '%')";
+            sql.append(" WHERE food_name LIKE concat('%', :foodName, '%')");
         }
 
-        log.info("sql={}", sql);
-        return template.query(sql, param, foodRowMapper());
+        log.info("Executing query: {}", sql);
+        return template.query(sql.toString(), param, foodRowMapper());
     }
 
     public void delete(Long foodId) {
@@ -106,4 +131,18 @@ public class FoodRepository {
     private RowMapper<Food> foodRowMapper() {
         return BeanPropertyRowMapper.newInstance(Food.class);
     }
+
+    public int countTotalFoods(FoodSearchCond cond) {
+        String foodName = cond.getFoodName();
+
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM food");
+
+        if (StringUtils.hasText(foodName)) {
+            sql.append(" WHERE food_name LIKE concat('%', :foodName, '%')");
+        }
+
+        SqlParameterSource param = new BeanPropertySqlParameterSource(cond);
+        return template.queryForObject(sql.toString(), param, Integer.class);
+    }
+
 }
