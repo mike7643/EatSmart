@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="../css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EatSmart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .header {
+            background: linear-gradient(to right, #5e63ff, #ae66ff);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+        .main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
+            width: 100%;
+        }
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .box {
+            width: 300px;
+            height: 100px;
+            border-radius: 20px;
+            background: linear-gradient(to right, #fff, #f0f0f0);
+            margin: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .box .content {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+        }
+        .box:hover .content {
+            color: #5e63ff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 헤더 -->
+    <div class="header">
+        <h1>EatSmart</h1>
+    </div>
+    <!-- 메인 콘텐츠 -->
+    <div class="main" th:object="${member}">
+        <!-- 제목 -->
+        <h1 class="title">EatSmart</h1>
+
+        <h2 th:text="|*{name}님, 환영합니다!|" style="text-align: center;"></h2>
+        <hr style="width: 100%;">
+
+        <!-- 로그아웃 -->
+        <div class="box">
+            <button class="content btn btn-outline-primary btn-lg btn-block"
+                    th:onclick="|location.href='@{/logout}'|"
+                    type="button">로그아웃</button>
+        </div>
+
+        <!-- 마이페이지 박스 -->
+        <div class="box">
+            <button class="content btn btn-outline-primary btn-lg btn-block"
+                    th:onclick="|location.href='@{/mypage}'|"
+                    type="button">마이페이지</button>
+        </div>
+        <!-- 오늘의 식단 -->
+        <div class="box">
+            <button class="content btn btn-outline-primary btn-lg btn-block"
+                    th:onclick="|location.href='@{/add}'|"
+                    type="button">오늘의 식단</button>
+        </div>
+
+        <div class="box">
+            <button class="content btn btn-outline-primary btn-lg btn-block"
+                    th:onclick="|location.href='@{/week}'|"
+                    type="button">이주의 식단</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

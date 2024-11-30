@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+        .main {
+            padding: 20px;
+        }
+        .box {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .box h4 {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 15px;
+        }
+        .box p {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        .btn {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        input, button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        input {
+            background: #e9ecef;
+            color: black;
+            outline: none;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .bmi-result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .bmi-result h4 {
+            font-size: 1.2rem;
+            color: #343a40;
+        }
+        .bmi-result p {
+            font-size: 1rem;
+            color: #495057;
+        }
+        .bmi-bar {
+            display: flex;
+            width: 100%;
+            height: 30px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 20px;
+        }
+        .bmi-bar span {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+        }
+        .underweight {
+            background-color: #17a2b8;
+        }
+        .normal {
+            background-color: #28a745;
+        }
+        .overweight {
+            background-color: #ffc107;
+        }
+        .obese {
+            background-color: #dc3545;
+        }
+        .extremely-obese {
+            background-color: #d9534f;
+        }
+        .bmi-pointer {
+            position: absolute;
+            height: 30px;
+            width: 4px;
+            background-color: black;
+            top: 0;
+            transition: left 0.5s ease;
+            z-index: 1;
+        }
+    </style>
+    <script>
+        function Calculate() {
+            var height = document.getElementById("h-input").value;
+            var weight = document.getElementById("w-input").value;
+
+            var result = parseFloat(weight) / (parseFloat(height) / 100) ** 2;
+
+            if (!isNaN(result)) {
+                document.getElementById("bmi-output").innerHTML = result.toFixed(2);
+                var statusText = "";
+                var pointer = document.querySelector('.bmi-pointer');
+                var leftPosition;
+
+                if (result < 18.5) {
+                    statusText = "저체중";
+                    leftPosition = (result / 18.5) * 20 + "%";
+                } else if (result < 25) {
+                    statusText = "정상";
+                    leftPosition = 20 + ((result - 18.5) / (25 - 18.5)) * 20 + "%";
+                } else if (result < 30) {
+                    statusText = "과체중";
+                    leftPosition = 40 + ((result - 25) / (30 - 25)) * 20 + "%";
+                } else if (result < 35) {
+                    statusText = "비만";
+                    leftPosition = 60 + ((result - 30) / (35 - 30)) * 20 + "%";
+                } else {
+                    statusText = "고도비만";
+                    leftPosition = 80 + ((result - 35) / (40 - 35)) * 20 + "%";
+                }
+
+                pointer.style.left = leftPosition;
+                document.getElementById("bmi-status").innerHTML = statusText;
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container" th:object="${member}">
+    <!-- 헤더 -->
+    <div class="header">
+        <h2>마이페이지</h2>
+    </div>
+    <!-- 메인 콘텐츠 -->
+    <div class="main">
+        <!-- 회원정보 -->
+        <div class="box">
+            <h4>회원정보</h4>
+            <p th:text="|이름 : *{name}|">이름: [사용자 이름]</p>
+            <p th:text="|email : *{email}|">이메일: [사용자 이메일]</p>
+        </div>
+        <!-- 비밀번호 변경 -->
+        <div class="box">
+            <button class="btn" th:onclick="|location.href='@{/updatememberinfo}'|">비밀번호 변경</button>
+        </div>
+        <!-- 나의 BMI 계산 값 -->
+        <div class="box">
+            <h4>BMI 계산기</h4>
+            <label>
+                <input id="h-input" type="number" placeholder="키(cm)">
+            </label>
+            <label>
+                <input id="w-input" type="number" placeholder="몸무게(kg)">
+            </label>
+            <button class="btn" onclick="Calculate()">Calculate BMI</button>
+
+            <div class="bmi-result">
+                <h4>BMI 수치:</h4>
+                <p id="bmi-output"></p>
+                <h4>상태:</h4>
+                <p id="bmi-status"></p>
+                <div class="bmi-bar">
+                    <span class="underweight">저체중</span>
+                    <span class="normal">정상</span>
+                    <span class="overweight">과체중</span>
+                    <span class="obese">비만</span>
+                    <span class="extremely-obese">고도비만</span>
+                    <div class="bmi-pointer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script th:if="${already != null}">
+    alert('[[${already}]]');
+</script>
+</html>

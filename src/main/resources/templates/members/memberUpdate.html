@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 정보 변경</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .header {
+            background: linear-gradient(to right, #5e63ff, #ae66ff);
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+        }
+        .form-container:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .required:after {
+            content: '*';
+            color: #dc3545;
+            margin-left: 5px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .field-error {
+            border-color: #dc3545;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            width: 48%;
+            font-size: 16px;
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        .btn-secondary {
+            background-color: #f44336;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 헤더 -->
+    <div class="header">
+        <h1>EatSmart</h1>
+    </div>
+    <!-- 회원 정보 변경 폼 -->
+    <div class="form-container">
+        <h2>회원 정보 변경</h2>
+        <form th:action th:object="${memberUpdate}" method="post" onsubmit="return confirmSubmit()">
+            <div>
+                <label for="password" class="required">비밀번호</label>
+                <input type="password" id="password" th:field="*{password}" th:errorclass="field-error">
+                <div class="field-error" th:errors="*{password}"></div>
+            </div>
+            <div>
+                <label for="confirm_password" class="required">비밀번호 확인</label>
+                <input type="password" id="confirm_password" th:field="*{confirmPassword}" th:errorclass="field-error">
+                <div class="field-error" th:errors="*{confirmPassword}"></div>
+            </div>
+            <div>
+                <label for="email" class="required">이메일</label>
+                <input type="text" id="email" th:field="*{email}" th:errorclass="field-error">
+                <div class="field-error" th:errors="*{email}"></div>
+            </div>
+            <div>
+                <label for="height">키 (cm)</label>
+                <input type="number" id="height" th:field="*{height}" placeholder="선택 사항">
+                <div class="field-error" th:errors="*{height}"></div>
+            </div>
+            <div>
+                <label for="weight">몸무게 (kg)</label>
+                <input type="number" id="weight" th:field="*{weight}" placeholder="선택 사항">
+                <div class="field-error" th:errors="*{weight}"></div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" type="submit">정보 변경</button>
+                <button class="btn btn-secondary" type="button" th:onclick="|location.href='@{/mypage}'|">취소</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 플래시 메시지 처리 영역 -->
+<div id="flash-message" th:if="${memberUpdateSessionOut}" th:text="${memberUpdateSessionOut}" style="display: none;"></div>
+
+<script>
+    function confirmSubmit() {
+        return confirm("정말로 회원 정보를 변경하시겠습니까?");
+    }
+
+</script>
+
+</body>
+</html>
